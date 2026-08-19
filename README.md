@@ -80,4 +80,3 @@ npm run check:dist
 `dist/index.js` is a committed generated artifact so callers do not install
 dependencies. `npm run check:dist` rebuilds the bundle and checks that the
 committed artifact has no diff.
-

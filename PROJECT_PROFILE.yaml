@@ -21,4 +21,3 @@ project:
       - dev.destructive_action
       - auth.secret_read_or_print
       - finance.spending_or_paid_service_change
-

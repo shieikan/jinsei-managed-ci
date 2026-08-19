@@ -15,4 +15,3 @@ billing, destructive, background-service, scheduler, plugin, API, or second
 control-plane behavior. Do not log profile contents, credentials, tokens, or
 private runtime data. Keep dependency and GitHub Action references pinned and
 reviewable.
-

@@ -23,4 +23,3 @@ jobs:
         run: npm run build
       - name: Check generated bundle
         run: git diff --exit-code -- dist/index.js
-

@@ -17,4 +17,3 @@ jobs:
         uses: actions/checkout@0000000000000000000000000000000000000000 # replace with an immutable checkout commit SHA
       - name: Validate PROJECT_PROFILE.yaml
         uses: shieikan/jinsei-managed-ci@0000000000000000000000000000000000000000 # replace with this action's immutable commit SHA
-
