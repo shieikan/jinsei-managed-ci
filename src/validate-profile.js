@@ -57,7 +57,12 @@ function rejectUnsafeYamlAst(document) {
       }
     },
     Pair(_key, node) {
-      if (YAML.isScalar(node.key) && node.key.value === "<<") {
+      if (
+        YAML.isScalar(node.key) &&
+        node.key.type === YAML.Scalar.PLAIN &&
+        !node.key.tag &&
+        node.key.value === "<<"
+      ) {
         fail("merge keys are not allowed");
       }
     },

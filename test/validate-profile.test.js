@@ -204,6 +204,25 @@ test("rejects unused anchors but preserves ordinary quoted and block-scalar text
     allowedCount: 1,
     forbiddenCount: 0,
   });
+
+  for (const quotedMergeKey of ['"<<"', "'<<'", "!!str <<"]) {
+    const quotedMergeKeyResult = validateProfileText(
+      [
+        "schema_version: 6",
+        `${quotedMergeKey}: ordinary text`,
+        "project:",
+        "  repo: owner/name",
+        "  authority:",
+        "    allowed_actions: [dev.local_test]",
+      ].join("\n"),
+    );
+
+    assert.deepEqual(quotedMergeKeyResult, {
+      repository: "owner/name",
+      allowedCount: 1,
+      forbiddenCount: 0,
+    });
+  }
 });
 
 test("rejects text and files over the 1 MiB limit before parsing", () => {
