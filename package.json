@@ -1,0 +1,21 @@
+{
+  "name": "jinsei-managed-ci",
+  "version": "0.1.0",
+  "description": "Read-only GitHub Action for validating a Jinsei PROJECT_PROFILE.yaml contract",
+  "private": true,
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test",
+    "build": "ncc build src/index.js -o dist --minify",
+    "check:dist": "npm run build && git diff --exit-code -- dist/index.js"
+  },
+  "dependencies": {
+    "js-yaml": "4.3.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "0.38.3"
+  }
+}

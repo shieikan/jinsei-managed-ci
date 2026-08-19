@@ -1,0 +1,24 @@
+schema_version: 6
+project:
+  repo: shieikan/jinsei-managed-ci
+  type: public_ci_maintenance
+  authority:
+    allowed_actions:
+      - dev.local_inspect
+      - dev.local_edit
+      - dev.local_test
+      - dev.local_commit
+      - dev.github_push
+      - dev.github_pr_create
+    forbidden_actions:
+      - dev.repo_create
+      - dev.repo_visibility_change
+      - dev.release
+      - dev.deploy_public
+      - dev.secret_or_security_mutation
+      - dev.billing_or_paid_service_change
+      - dev.production_data_mutation
+      - dev.destructive_action
+      - auth.secret_read_or_print
+      - finance.spending_or_paid_service_change
+

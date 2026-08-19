@@ -1,0 +1,20 @@
+name: Jinsei contract
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-profile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out caller repository
+        uses: actions/checkout@0000000000000000000000000000000000000000 # replace with an immutable checkout commit SHA
+      - name: Validate PROJECT_PROFILE.yaml
+        uses: shieikan/jinsei-managed-ci@0000000000000000000000000000000000000000 # replace with this action's immutable commit SHA
+

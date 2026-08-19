@@ -1,0 +1,11 @@
+name: Validate Jinsei project profile
+description: Validate the caller repository's PROJECT_PROFILE.yaml authority contract
+inputs:
+  profile_path:
+    description: Relative path to the caller repository's project profile
+    required: false
+    default: PROJECT_PROFILE.yaml
+runs:
+  using: node24
+  main: dist/index.js
+
