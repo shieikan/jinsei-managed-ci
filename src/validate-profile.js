@@ -7,7 +7,7 @@ const yaml = require("js-yaml");
 const MAX_PROFILE_BYTES = 1024 * 1024;
 const DEFAULT_PROFILE_PATH = "PROJECT_PROFILE.yaml";
 const REPOSITORY_PATTERN = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
-const ACTION_PATTERN = /^[a-z][a-z0-9_-]*(?:\.[a-z][a-z0-9_-]*)*$/;
+const ACTION_PATTERN = /^[a-z][a-z0-9_-]*\.[a-z][a-z0-9_-]*(?:\.[a-z][a-z0-9_-]*)*$/;
 
 class ProfileValidationError extends Error {
   constructor(reason, pathLabel = "") {

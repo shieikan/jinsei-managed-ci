@@ -248,7 +248,15 @@ test("rejects bad repository identities and GITHUB_REPOSITORY mismatches", () =>
 });
 
 test("rejects non-canonical action identifiers", () => {
-  for (const action of ["", "DEV.local_test", "dev..local_test", "dev/local_test", "dev."]) {
+  for (const action of [
+    "",
+    "dev",
+    "local_test",
+    "DEV.local_test",
+    "dev..local_test",
+    "dev/local_test",
+    "dev.",
+  ]) {
     assertValidationError(
       () =>
         validateProfileText(
