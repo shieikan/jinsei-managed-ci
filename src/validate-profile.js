@@ -2,7 +2,7 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-const yaml = require("js-yaml");
+const YAML = require("yaml");
 
 const MAX_PROFILE_BYTES = 1024 * 1024;
 const DEFAULT_PROFILE_PATH = "PROJECT_PROFILE.yaml";
@@ -36,67 +36,32 @@ function isMapping(value) {
   return prototype === Object.prototype || prototype === null;
 }
 
-function isTokenBoundary(character) {
-  return character === undefined || /[\s\[\]{}?,:]/u.test(character);
-}
-
-function rejectUnsafeYamlTokens(source) {
-  let quote = null;
-
-  for (let index = 0; index < source.length; index += 1) {
-    const character = source[index];
-
-    if (quote === "'") {
-      if (character === "'" && source[index + 1] === "'") {
-        index += 1;
-      } else if (character === "'") {
-        quote = null;
-      }
-      continue;
-    }
-
-    if (quote === '"') {
-      if (character === "\\") {
-        index += 1;
-      } else if (character === '"') {
-        quote = null;
-      }
-      continue;
-    }
-
-    if (character === "'") {
-      quote = "'";
-      continue;
-    }
-    if (character === '"') {
-      quote = '"';
-      continue;
-    }
-
-    if (character === "#" && (index === 0 || /\s/u.test(source[index - 1]))) {
-      const newline = source.indexOf("\n", index);
-      index = newline === -1 ? source.length : newline;
-      continue;
-    }
-
-    if ((character === "&" || character === "*") && isTokenBoundary(source[index - 1])) {
+function rejectUnsafeYamlAst(document) {
+  YAML.visit(document, {
+    Alias() {
       fail("anchors and aliases are not allowed");
-    }
-
-    if (
-      character === "<" &&
-      source[index + 1] === "<" &&
-      isTokenBoundary(source[index - 1])
-    ) {
-      let next = index + 2;
-      while (/\s/u.test(source[next] || "")) {
-        next += 1;
+    },
+    Scalar(_key, node) {
+      if (node.anchor) {
+        fail("anchors and aliases are not allowed");
       }
-      if (source[next] === ":") {
+    },
+    Map(_key, node) {
+      if (node.anchor) {
+        fail("anchors and aliases are not allowed");
+      }
+    },
+    Seq(_key, node) {
+      if (node.anchor) {
+        fail("anchors and aliases are not allowed");
+      }
+    },
+    Pair(_key, node) {
+      if (YAML.isScalar(node.key) && node.key.value === "<<") {
         fail("merge keys are not allowed");
       }
-    }
-  }
+    },
+  });
 }
 
 function parseProfileText(profileText) {
@@ -107,14 +72,32 @@ function parseProfileText(profileText) {
     fail("profile exceeds the 1 MiB limit");
   }
 
-  rejectUnsafeYamlTokens(profileText);
-
+  let document;
   try {
-    return yaml.load(profileText, {
-      json: false,
-      schema: yaml.CORE_SCHEMA,
+    document = YAML.parseDocument(profileText.replace(/\r\n?/gu, "\n"), {
+      version: "1.2",
+      schema: "core",
+      strict: true,
+      uniqueKeys: true,
+      merge: false,
+      prettyErrors: false,
+      logLevel: "error",
     });
   } catch (_error) {
+    fail("malformed YAML");
+  }
+
+  if (!document || document.errors.length > 0) {
+    fail("malformed YAML");
+  }
+
+  try {
+    rejectUnsafeYamlAst(document);
+    return document.toJS({ maxAliasCount: 0 });
+  } catch (error) {
+    if (error instanceof ProfileValidationError) {
+      throw error;
+    }
     fail("malformed YAML");
   }
 }

@@ -151,6 +151,61 @@ test("rejects aliases and merge keys before validation", () => {
   );
 });
 
+test("rejects anchors and aliases with CR-only line endings", () => {
+  const profile = [
+    "# leading comment",
+    "actions: &actions",
+    "  - dev.local_test",
+    "schema_version: 6",
+    "project:",
+    "  repo: owner/name",
+    "  authority:",
+    "    allowed_actions: *actions",
+  ].join("\r");
+
+  assertValidationError(
+    () => validateProfileText(profile),
+    /anchors and aliases/u,
+  );
+});
+
+test("rejects unused anchors but preserves ordinary quoted and block-scalar text", () => {
+  assertValidationError(
+    () =>
+      validateProfileText(
+        [
+          "schema_version: 6",
+          "unused: &unused ordinary text",
+          "project:",
+          "  repo: owner/name",
+          "  authority:",
+          "    allowed_actions: [dev.local_test]",
+        ].join("\n"),
+      ),
+    /anchors and aliases/u,
+  );
+
+  const result = validateProfileText(
+    [
+      "schema_version: 6",
+      "notes: |",
+      "  * ordinary text",
+      "  & ordinary text",
+      'quoted: "* ordinary text & ordinary text"',
+      "project:",
+      "  repo: owner/name",
+      "  authority:",
+      "    allowed_actions: [dev.local_test]",
+    ].join("\n"),
+  );
+
+  assert.deepEqual(result, {
+    repository: "owner/name",
+    allowedCount: 1,
+    forbiddenCount: 0,
+  });
+});
+
 test("rejects text and files over the 1 MiB limit before parsing", () => {
   const oversizedText = `${VALID_PROFILE}\npadding: ${"x".repeat(MAX_PROFILE_BYTES)}`;
   assertValidationError(() => validateProfileText(oversizedText), /1 MiB/u);
