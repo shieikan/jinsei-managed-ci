@@ -59,9 +59,10 @@ function rejectUnsafeYamlAst(document) {
     Pair(_key, node) {
       if (
         YAML.isScalar(node.key) &&
-        node.key.type === YAML.Scalar.PLAIN &&
-        !node.key.tag &&
-        node.key.value === "<<"
+        (node.key.tag === "tag:yaml.org,2002:merge" ||
+          (node.key.type === YAML.Scalar.PLAIN &&
+            !node.key.tag &&
+            node.key.value === "<<"))
       ) {
         fail("merge keys are not allowed");
       }

@@ -151,6 +151,27 @@ test("rejects aliases and merge keys before validation", () => {
   );
 });
 
+test("rejects explicit YAML merge tags", () => {
+  for (const mergeKey of [
+    "!!merge <<",
+    "!<tag:yaml.org,2002:merge> <<",
+  ]) {
+    assertValidationError(
+      () =>
+        validateProfileText(
+          [
+            "schema_version: 6",
+            "project:",
+            "  repo: owner/name",
+            "  authority:",
+            `    ${mergeKey}: {allowed_actions: [dev.local_test]}`,
+          ].join("\n"),
+        ),
+      /merge keys are not allowed/u,
+    );
+  }
+});
+
 test("rejects anchors and aliases with CR-only line endings", () => {
   const profile = [
     "# leading comment",
