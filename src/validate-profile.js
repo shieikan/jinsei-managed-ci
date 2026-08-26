@@ -37,25 +37,19 @@ function isMapping(value) {
 }
 
 function rejectUnsafeYamlAst(document) {
+  const rejectAnchoredNode = (_key, node) => {
+    if (node.anchor) {
+      fail("anchors and aliases are not allowed");
+    }
+  };
+
   YAML.visit(document, {
     Alias() {
       fail("anchors and aliases are not allowed");
     },
-    Scalar(_key, node) {
-      if (node.anchor) {
-        fail("anchors and aliases are not allowed");
-      }
-    },
-    Map(_key, node) {
-      if (node.anchor) {
-        fail("anchors and aliases are not allowed");
-      }
-    },
-    Seq(_key, node) {
-      if (node.anchor) {
-        fail("anchors and aliases are not allowed");
-      }
-    },
+    Scalar: rejectAnchoredNode,
+    Map: rejectAnchoredNode,
+    Seq: rejectAnchoredNode,
     Pair(_key, node) {
       if (
         YAML.isScalar(node.key) &&
