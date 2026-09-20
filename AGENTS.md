@@ -1,4 +1,4 @@
-# AGENTS.md — public managed CI maintenance
+# jinsei-managed-ci/AGENTS.md
 
 This repository contains only a read-only GitHub Action and its tests. Work in
 this repository is limited to sanitized public CI maintenance: inspect files,
